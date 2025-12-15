@@ -10,8 +10,8 @@ This repository provides reference implementations of GitHub Actions workflows t
 
 This repository includes workflow examples for the following security scanning tools:
 
-- **GitHub Advanced Security (CodeQL)** - `examples/ghas.yml`
-- **Snyk** - `examples/snyk.yml`
+- **GitHub Advanced Security (CodeQL)** - [`examples/ghas.yml`](examples/ghas.yml)
+- **Snyk** - [`examples/snyk.yml`](examples/snyk.yml)
 
 The cwe-action is scanner-agnostic and compatible with any tool capable of outputting CWE identifiers. Many security scanners support the [SARIF](https://docs.oasis-open.org/sarif/sarif/v2.1.0/sarif-v2.1.0.html) (Static Analysis Results Interchange Format) standard, typically serialized as JSON. Scanner outputs may require transformation to conform to the expected input format. The examples in this repository utilize [jq](https://jqlang.org/), a lightweight command-line JSON processor pre-installed on all GitHub-hosted runners, to perform the necessary data reshaping operations.
 
@@ -26,7 +26,7 @@ All workflows require:
 
 ### Scanner-Specific Requirements
 
-- **GitHub Advanced Security (CodeQL)**: Requires GitHub Advanced Security to be enabled on your organization or repository. This feature is included with GitHub Enterprise Cloud and can be enabled for public repositories.
+- **GitHub Advanced Security (CodeQL)**: Requires GitHub Advanced Security to be enabled on your organization or repository. This feature requires a separate license purchase for GitHub Enterprise Cloud and can be enabled for public repositories.
 - **Snyk**: Requires a Snyk account and API token. Sign up at [snyk.io](https://snyk.io) to obtain your API key.
 
 ## Installation
@@ -59,7 +59,7 @@ Each workflow implements a two-stage pipeline:
 1. **Scan Stage**: Executes the security scanner and extracts CWE identifiers from the analysis results
 2. **Integration Stage**: Transmits the extracted CWE data to the Security Journey API via the cwe-action
 
-The cwe-action accepts a single required input: an array of CWE identifiers. Any security scanner capable of producing output in this format can be integrated with the action.
+The cwe-action requires a Security Journey API key and an array of CWE identifiers. Any security scanner capable of producing CWE output in this format can be integrated with the action.
 
 ## Integration Requirements
 
@@ -69,7 +69,6 @@ To integrate a custom security scanner with the cwe-action, the scanner must pro
 - name: Process extracted CWEs
   uses: securityjourney/cwe-action@v1
   with:
-    api_url: https://api.securityjourney.dev/integrations
     api_key: ${{ secrets.SECURITY_JOURNEY_API_KEY }}
     cwes: "${{ needs.scan.outputs.cwes }}" # Array of CWE IDs
 ```
