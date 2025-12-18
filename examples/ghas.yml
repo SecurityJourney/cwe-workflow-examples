@@ -1,0 +1,71 @@
+name: GitHub Advanced Security Scan with CWE Extraction
+
+on:
+  pull_request:
+    branches:
+      - main
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  scan:
+    name: CodeQL Security Scan
+    runs-on: ubuntu-latest
+
+    permissions:
+      actions: read
+      contents: read
+      security-events: read
+
+    outputs:
+      cwes: ${{ steps.extract-cwes.outputs.cwes }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v4
+        with:
+          languages: python
+          queries: security-and-quality
+          config: |
+            threat-models:
+              - local
+              - remote
+
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v4
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v4
+        with:
+          output: codeql-results
+          upload: false
+
+      - name: Extract CWEs from results
+        id: extract-cwes
+        run: |
+          cwes=$(jq -c '[.runs[].results[]?.ruleId as $rid | .runs[].tool.extensions[].rules[]? | select(.id == $rid) | .properties.tags[]? | select(startswith("external/cwe/")) | ltrimstr("external/cwe/")] | unique' codeql-results/*.sarif)
+          echo "cwes=$cwes" >> $GITHUB_OUTPUT
+
+  process-cwes:
+    name: Process CWEs
+    needs: scan
+    runs-on: ubuntu-latest
+
+    if: needs.scan.outputs.cwes != '[]'
+
+    steps:
+      - name: Process extracted CWEs
+        uses: cjengdahl/cwe-action@v1
+        with:
+          api_url: https://api.securityjourney.dev/integrations
+          api_key: ${{ secrets.SECURITY_JOURNEY_API_KEY }}
+          cwes: '${{ needs.scan.outputs.cwes }}'
+
+      - name: Print Security Journey Response
+        run: |
+          echo "Security Journey Response:"
+          echo '${{ steps.cwe-action.outputs.api_response }}'
