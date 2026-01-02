@@ -2,6 +2,9 @@ name: GitHub Advanced Security Scan with CWE Extraction
 
 on:
   pull_request:
+    types:
+      - opened
+      - synchronize
     branches:
       - main
 
@@ -59,9 +62,8 @@ jobs:
 
     steps:
       - name: Process extracted CWEs
-        uses: cjengdahl/cwe-action@v1
+        uses: SecurityJourney/cwe-action@v1
         with:
-          api_url: https://api.securityjourney.dev/integrations
           api_key: ${{ secrets.SECURITY_JOURNEY_API_KEY }}
           cwes: '${{ needs.scan.outputs.cwes }}'
 

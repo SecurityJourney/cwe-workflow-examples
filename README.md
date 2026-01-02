@@ -2,7 +2,7 @@
 
 ## Overview
 
-This repository provides reference implementations of GitHub Actions workflows that integrate the [securityjourney/cwe-action@v1](https://github.com/securityjourney/cwe-action) with industry-standard security scanning tools. These examples illustrate best practices for extracting Common Weakness Enumeration (CWE) identifiers from scanner outputs and transmitting them to the Security Journey platform via the cwe-action.
+This repository provides reference implementations of GitHub Actions workflows that integrate the [SecurityJourney/cwe-action@v1](https://github.com/SecurityJourney/cwe-action) with industry-standard security scanning tools. These examples illustrate best practices for extracting Common Weakness Enumeration (CWE) identifiers from scanner outputs and transmitting them to the Security Journey platform via the cwe-action.
 
 ## Example Workflows
 
@@ -67,7 +67,7 @@ To integrate a custom security scanner with the cwe-action, the scanner must pro
 
 ```yaml
 - name: Process extracted CWEs
-  uses: securityjourney/cwe-action@v1
+  uses: SecurityJourney/cwe-action@v1
   with:
     api_key: ${{ secrets.SECURITY_JOURNEY_API_KEY }}
     cwes: "${{ needs.scan.outputs.cwes }}" # Array of CWE IDs
