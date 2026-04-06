@@ -62,7 +62,7 @@ jobs:
 
     steps:
       - name: Process extracted CWEs
-        uses: SecurityJourney/cwe-action@v1
+        uses: SecurityJourney/adapt-action@v1
         with:
           api_key: ${{ secrets.SECURITY_JOURNEY_API_KEY }}
           cwes: '${{ needs.scan.outputs.cwes }}'
@@ -70,4 +70,4 @@ jobs:
       - name: Print Security Journey Response
         run: |
           echo "Security Journey Response:"
-          echo '${{ steps.cwe-action.outputs.api_response }}'
+          echo '${{ steps.adapt-action.outputs.api_response }}'
